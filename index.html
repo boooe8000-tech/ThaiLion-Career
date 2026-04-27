@@ -10,41 +10,60 @@
         body { font-family: 'Kanit', sans-serif; background-color: #f3f4f6; }
         .airasia-red { background-color: #ce1219; }
         .disabled-btn { background-color: #9ca3af !important; cursor: not-allowed; }
+        /* สไตล์สำหรับเมนูบนสุด */
+        .nav-link { font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
+        .nav-link:hover { color: #fecaca; }
     </style>
 </head>
 <body class="bg-gray-50">
-    <div class="airasia-red h-64 w-full flex items-center justify-center text-white relative overflow-hidden">
+
+    <nav class="airasia-red text-white py-4 px-6 flex justify-between items-center shadow-lg sticky top-0 z-[100]">
+        <div class="flex items-center gap-2">
+            <div class="w-2 h-6 bg-white rounded-full"></div>
+            <span class="font-bold italic tracking-tighter uppercase text-sm">AirAsia <span class="font-light">Thai X</span></span>
+        </div>
+        <div class="flex gap-4">
+            <a href="check-status.html" class="nav-link">เช็คสถานะ</a>
+            <a href="staff.html" class="nav-link bg-white/20 px-3 py-1 rounded-lg">Staff Login</a>
+        </div>
+    </nav>
+
+    <div class="airasia-red h-64 w-full flex items-center justify-center text-white relative overflow-hidden -mt-1">
         <div class="z-10 text-center">
-            <h1 class="text-4xl font-bold italic tracking-tighter uppercase">AirAsia <span class="font-light">Thai X</span></h1>
-            <p class="text-sm opacity-80 mt-2 uppercase tracking-widest">Join our professional team</p>
+            <h1 class="text-4xl font-bold italic tracking-tighter uppercase">Join Our <span class="font-light">Dream Team</span></h1>
+            <p class="text-[10px] opacity-80 mt-2 uppercase tracking-[0.3em] font-light">Professional Aviation Career</p>
         </div>
     </div>
 
     <div class="max-w-4xl mx-auto -mt-10 p-4 relative z-20">
-        <div class="bg-white rounded-3xl shadow-2xl p-8 mb-10">
+        <div class="bg-white rounded-[2.5rem] shadow-2xl p-8 mb-10 border-t-8 border-red-600">
             <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-                <span class="w-2 h-8 airasia-red rounded-full"></span> ตำแหน่งที่เปิดรับสมัคร
+                ตำแหน่งที่เปิดรับสมัคร
             </h2>
             
             <div id="dept-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <p class="text-center text-gray-400 py-10 col-span-full">กำลังโหลดข้อมูลแผนก...</p>
+                <p class="text-center text-gray-400 py-10 col-span-full italic">กำลังตรวจสอบเที่ยวบิน (โหลดข้อมูล)...</p>
             </div>
         </div>
     </div>
 
-    <div id="apply-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div id="apply-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[150] flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-lg rounded-[2.5rem] p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
-            <h3 id="modal-dept-title" class="text-2xl font-bold text-red-600 mb-2"></h3>
-            <p class="text-xs text-gray-400 mb-6 uppercase tracking-widest">Application Form</p>
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <h3 id="modal-dept-title" class="text-2xl font-bold text-red-600"></h3>
+                    <p class="text-[10px] text-gray-400 uppercase tracking-widest italic">Recruitment Form</p>
+                </div>
+                <button onclick="closeModal()" class="text-gray-300 hover:text-red-500 text-2xl">&times;</button>
+            </div>
             
             <div class="space-y-4">
                 <div>
-                    <label class="text-xs font-bold text-gray-500 ml-1 uppercase">ชื่อเล่น (In-game Name)</label>
-                    <input type="text" id="app-name" class="w-full border-2 border-gray-100 p-4 rounded-2xl outline-none focus:border-red-500 transition">
+                    <label class="text-[10px] font-bold text-gray-500 ml-1 uppercase">ชื่อเล่น (In-game Name)</label>
+                    <input type="text" id="app-name" placeholder="ระบุชื่อเพื่อใช้เข้าสู่ระบบ" class="w-full border-2 border-gray-100 p-4 rounded-2xl outline-none focus:border-red-500 transition">
                 </div>
                 <div id="questions-area" class="space-y-4"></div>
-                <button onclick="submitApp()" class="w-full airasia-red text-white py-4 rounded-2xl font-bold text-lg hover:opacity-90 transition shadow-lg mt-4">ส่งใบสมัคร ✈️</button>
-                <button onclick="closeModal()" class="w-full bg-gray-100 text-gray-500 py-3 rounded-2xl font-bold text-sm">ยกเลิก</button>
+                <button onclick="submitApp()" class="w-full airasia-red text-white py-4 rounded-2xl font-bold text-lg hover:opacity-90 transition shadow-lg mt-4 shadow-red-200">ส่งใบสมัคร ✈️</button>
             </div>
         </div>
     </div>
@@ -69,21 +88,29 @@
             db.ref('Settings/Departments').on('value', snap => {
                 const container = document.getElementById('dept-container');
                 container.innerHTML = "";
+                if(!snap.exists()) {
+                    container.innerHTML = "<p class='col-span-full text-center text-gray-400'>ยังไม่มีตำแหน่งที่เปิดรับในขณะนี้</p>";
+                    return;
+                }
                 snap.forEach(child => {
                     const d = child.val();
-                    const statusText = d.isOpen ? "เปิดรับสมัคร" : "ปิดรับสมัคร";
+                    const statusText = d.isOpen ? "Status: Open" : "Status: Closed";
                     const statusColor = d.isOpen ? "text-green-500" : "text-red-500 font-bold";
                     const btnClass = d.isOpen ? "airasia-red" : "disabled-btn";
                     
                     container.innerHTML += `
-                        <div class="border-2 border-gray-50 p-6 rounded-[2rem] hover:border-red-100 transition group bg-white shadow-sm">
-                            <h4 class="text-lg font-bold text-gray-800">${d.name}</h4>
-                            <p class="text-xs text-gray-400 mt-1 mb-4">${d.requirement || 'ไม่ระบุคุณสมบัติ'}</p>
-                            <p class="text-[10px] mb-4 ${statusColor} uppercase tracking-tighter">${statusText}</p>
-                            <button onclick="${d.isOpen ? `openModal('${d.name}', '${d.questions}')` : ''}" 
-                                class="w-full ${btnClass} text-white py-3 rounded-xl text-xs font-bold transition">
-                                ${d.isOpen ? 'สมัครตำแหน่งนี้' : 'ขณะนี้ปิดรับสมัคร'}
-                            </button>
+                        <div class="border-2 border-gray-50 p-6 rounded-[2rem] hover:border-red-100 transition group bg-white shadow-sm flex flex-col justify-between">
+                            <div>
+                                <h4 class="text-lg font-bold text-gray-800">${d.name}</h4>
+                                <p class="text-xs text-gray-400 mt-1 mb-4 h-8 overflow-hidden">${d.requirement || 'ต้องการผู้มีใจรักในงานบริการ'}</p>
+                            </div>
+                            <div>
+                                <p class="text-[9px] mb-3 ${statusColor} uppercase tracking-widest">${statusText}</p>
+                                <button onclick="${d.isOpen ? `openModal('${d.name}', '${d.questions}')` : ''}" 
+                                    class="w-full ${btnClass} text-white py-3 rounded-xl text-xs font-bold transition">
+                                    ${d.isOpen ? 'Apply Now' : 'Closed'}
+                                </button>
+                            </div>
                         </div>
                     `;
                 });
@@ -99,7 +126,7 @@
             currentQuestions.forEach((q, i) => {
                 area.innerHTML += `
                     <div>
-                        <label class="text-xs font-bold text-gray-500 ml-1">${q.trim()}</label>
+                        <label class="text-[10px] font-bold text-gray-500 ml-1 uppercase">คำถาม: ${q.trim()}</label>
                         <textarea class="q-input w-full border-2 border-gray-100 p-4 rounded-2xl outline-none focus:border-red-500 transition" rows="2"></textarea>
                     </div>
                 `;
@@ -111,7 +138,7 @@
 
         function submitApp() {
             const name = document.getElementById('app-name').value.trim();
-            if(!name) return alert("กรุณากรอกชื่อเล่น");
+            if(!name) return alert("กรุณากรอกชื่อเล่นเพื่อใช้ในการเช็คผล");
             
             const answers = [];
             document.querySelectorAll('.q-input').forEach(input => answers.push(input.value.trim()));
@@ -122,8 +149,8 @@
                 status: "Pending",
                 time: new Date().toLocaleString('th-TH')
             }).then(() => {
-                alert("ส่งใบสมัครสำเร็จ! กรุณารอการตรวจสอบ");
-                location.reload();
+                alert("บันทึกข้อมูลเรียบร้อย! คุณสามารถใช้ชื่อเล่นเพื่อเช็คสถานะได้ในภายหลัง");
+                closeModal();
             });
         }
 
