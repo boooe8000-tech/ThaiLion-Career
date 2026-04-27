@@ -9,330 +9,98 @@
         body { 
             font-family: 'Kanit', sans-serif; margin: 0; padding: 0; min-height: 100vh;
             background-color: #0f172a; 
-            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('plane.png'); 
-            background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed;
-        }
-        #login-section { position: relative; z-index: 50; }
-        .login-card { background-color: rgba(255, 255, 255, 0.98); border-top: 8px solid #ce1219; }
-        .tab-active { background-color: #ef4444 !important; color: white !important; }
-        .dashboard-bg { background-color: rgba(15, 23, 42, 0.95); min-height: 100vh; width: 100%; position: relative; z-index: 60; }
-    </style>
-</head>
-<body>
-
-    <div id="login-section" class="min-h-screen flex items-center justify-center p-6">
-        <div class="login-card p-8 rounded-[2rem] w-full max-w-md text-gray-800 shadow-2xl text-center">
-            <h1 class="text-3xl font-bold text-red-600 italic uppercase mb-8">Staff Login</h1>
-            <input type="text" id="login-user" placeholder="Username" class="w-full border-2 border-gray-100 p-4 rounded-2xl mb-4 outline-none focus:border-red-500">
-            <input type="password" id="login-pass" placeholder="Password" class="w-full border-2 border-gray-100 p-4 rounded-2xl mb-6 outline-none focus:border-red-500">
-            <button onclick="handleLogin()" class="w-full bg-red-600 text-white py-4 rounded-2xl font-bold hover:bg-red-700 transition">LOGIN ✈️</button>
-        </div>
-    </div>
-
-    <div id="staff-dashboard" class="hidden dashboard-bg p-4 md:p-10 text-white">
-        <div class="max-w-6xl mx-auto space-y-6">
-            <div class="flex justify-between items-center border-b border-slate-700 pb-5">
-                <div>
-                    <h1 class="text-2xl font-bold text-red-500 italic uppercase">AIRASIA <span class="text-white font-light text-sm">ADMIN PANEL</span></h1>
-                    <p id="staff-info" class="text-[10px] text-gray-400 mt-1 uppercase"></p>
-                </div>
-                <button onclick="location.reload()" class="bg-slate-800 px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-red-600 transition">LOGOUT</button>
-            </div>
-
-            <div class="flex gap-2 overflow-x-auto pb-2" id="menu-tabs">
-                <button onclick="switchTab('apps')" id="btn-apps" class="bg-slate-800 px-6 py-2 rounded-full text-xs font-bold whitespace-nowrap">ใบสมัคร</button>
-                <button onclick="switchTab('depts')" id="btn-depts" class="bg-slate-800 px-6 py-2 rounded-full text-xs font-bold whitespace-nowrap">จัดการแผนก</button>
-                <button onclick="switchTab('staffs')" id="btn-staff-manage" class="hidden bg-slate-800 px-6 py-2 rounded-full text-xs font-bold whitespace-nowrap">Staff Accounts</button>
-            </div>
-
-            <div id="tab-apps" class="tab-content">
-                <div class="bg-slate-800/80 rounded-2xl border border-slate-700 overflow-hidden">
-                    <table class="w-full text-left text-sm">
-                        <thead class="bg-slate-900 text-gray-500 text-[10px] uppercase">
-                            <tr>
-                                <th class="p-4">ผู้สมัคร</th>
-                                <th class="p-4">แผนก</th>
-                                <th class="p-4 text-center">สถานะ</th>
-                                <th class="p-4 text-right">ดำเนินการ</th>
-                            </tr>
-                        </thead>
-                        <tbody id="app-list" class="divide-y divide-slate-700"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div id="tab-depts" class="tab-content hidden space-y-6">
-                <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
-                    <h3 class="font-bold text-blue-400 mb-4 text-sm uppercase italic">เพิ่ม/แก้ไขแผนก</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="text" id="dept-name" placeholder="ชื่อแผนก (เช่น Pilot)" class="bg-slate-900 border border-slate-700 p-4 rounded-2xl outline-none">
-                        <input type="text" id="dept-req" placeholder="คุณสมบัติสั้นๆ" class="bg-slate-900 border border-slate-700 p-4 rounded-2xl outline-none">
-                        <textarea id="dept-q" placeholder="คำถาม1, คำถาม2, คำถาม3 (คั่นด้วยคอมม่า)" class="bg-slate-900 border border-slate-700 p-4 rounded-2xl md:col-span-2 outline-none" rows="3"></textarea>
-                        <button onclick="createDept()" class="bg-blue-600 py-4 rounded-2xl font-bold col-span-full hover:bg-blue-500 transition">บันทึกข้อมูลแผนก 💾</button>
-                    </div>
-                </div>
-                <div id="dept-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-            </div>
-
-            <div id="tab-staffs" class="tab-content hidden space-y-4">
-                <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
-                    <h3 class="font-bold text-purple-400 mb-4 text-sm uppercase italic">สร้าง Account Staff ใหม่</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <input type="text" id="new-staff-user" placeholder="Username" class="bg-slate-900 border border-slate-700 p-4 rounded-2xl outline-none">
-                        <input type="text" id="new-staff-pass" placeholder="Password" class="bg-slate-900 border border-slate-700 p-4 rounded-2xl outline-none">
-                        <select id="new-staff-role" class="bg-slate-900 border border-slate-700 p-4 rounded-2xl outline-none">
-                            <option value="Admin">Admin</option>
-                            <option value="Mod">Mod</option>
-                        </select>
-                        <button onclick="createStaff()" class="bg-purple-600 py-4 rounded-2xl font-bold col-span-full hover:bg-purple-500">สร้าง</button>
-                    </div>
-                </div>
-                <div id="staff-list" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
-            </div>
-        </div>
-    </div>
-
-    <div id="view-modal" class="hidden fixed inset-0 bg-black/95 flex items-center justify-center p-4 z-[100] backdrop-blur-md">
-        <div class="bg-slate-900 p-8 rounded-[2.5rem] w-full max-w-lg border border-slate-700 text-white">
-            <h3 id="view-user" class="text-xl font-bold text-red-500 mb-4 uppercase italic"></h3>
-            <div id="view-ans-box" class="space-y-3 max-h-[60vh] overflow-y-auto"></div>
-            <button onclick="closeModal()" class="w-full bg-slate-800 mt-6 py-4 rounded-2xl font-bold">ปิดหน้าต่าง</button>
-        </div>
-    </div>
-
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
-    <script>
-        const firebaseConfig = {
-            apiKey: "AiZaSyC-y19Y2WF-3efQ0ixWZnosrOeqFaDRvMQ",
-            authDomain: "airasia-thaix-career.firebaseapp.com",
-            databaseURL: "https://airasia-thaix-career-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "airasia-thaix-career"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-
-        let userData = { name: "", role: "" };
-
-        function handleLogin() {
-            const u = document.getElementById('login-user').value.trim();
-            const p = document.getElementById('login-pass').value.trim();
-            if(u === "Dom" && p === "AirAsia") setupDashboard("Dom", "HeadAdmin");
-            else {
-                db.ref('Settings/StaffAccounts/' + u).once('value', s => {
-                    const d = s.val();
-                    if(d && d.password === p) setupDashboard(u, d.role);
-                    else alert("ชื่อหรือรหัสผ่านผิด!");
-                });
-            }
-        }
-
-        function setupDashboard(name, role) {
-            userData = { name, role };
-            document.getElementById('login-section').classList.add('hidden');
-            document.getElementById('staff-dashboard').classList.remove('hidden');
-            document.getElementById('staff-info').innerText = `${name} | ${role}`;
-            if(role === "HeadAdmin" || role === "Admin") document.getElementById('btn-staff-manage').classList.remove('hidden');
-            switchTab('apps'); loadData();
-        }
-
-        function switchTab(id) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-            document.querySelectorAll('#menu-tabs button').forEach(b => b.classList.remove('tab-active'));
-            document.getElementById('tab-' + id).classList.remove('hidden');
-            document.getElementById('btn-' + (id === 'staffs' ? 'staff-manage' : id)).classList.add('tab-active');
-        }
-
-        function setStatus(user, status) { db.ref('Applications/' + user).update({ status }); }
-        function delApp(user) { if(confirm(`ลบผู้สมัครชื่อ ${user} ใช่หรือไม่?`)) db.ref('Applications/' + user).remove(); }
-
-        function toggleDept(name, currentStatus) {
-            db.ref('Settings/Departments/' + name).update({ isOpen: !currentStatus });
-        }
-
-        function createDept() {
-            const n = document.getElementById('dept-name').value.trim();
-            const r = document.getElementById('dept-req').value.trim();
-            const q = document.getElementById('dept-q').value.trim();
-            if(!n) return;
-            db.ref('Settings/Departments/' + n).set({ name: n, requirement: r, questions: q, isOpen: true }).then(() => {
-                alert("บันทึกสำเร็จ!");
-                document.getElementById('dept-name').value = "";
-                document.getElementById('dept-req').value = "";
-                document.getElementById('dept-q').value = "";
-            });
-        }
-
-        function createStaff() {
-            const u = document.getElementById('new-staff-user').value.trim();
-            const p = document.getElementById('new-staff-pass').value.trim();
-            const r = document.getElementById('new-staff-role').value;
-            if(!u || !p) return;
-            db.ref('Settings/StaffAccounts/' + u).set({ password: p, role: r }).then(() => alert("สร้างสำเร็จ!"));
-        }
-
-        function loadData() {
-            db.ref('Applications').on('value', snap => {
-                const list = document.getElementById('app-list');
-                list.innerHTML = "";
-                snap.forEach(c => {
-                    const a = c.val();
-                    const statusColors = { 
-                        "Pending": "bg-slate-700", 
-                        "Passed": "bg-green-600", 
-                        "Failed": "bg-red-600",
-                        "Interview": "bg-yellow-500 text-black"
-                    };
-                    list.innerHTML += `
-                        <tr class="hover:bg-slate-700/30">
-                            <td class="p-4 font-bold text-blue-400 cursor-pointer" onclick="viewDetail('${c.key}')">${c.key} 🔍</td>
-                            <td class="p-4 text-gray-400 text-xs">${a.department}</td>
-                            <td class="p-4 text-center"><span class="px-2 py-1 rounded text-[10px] font-bold uppercase ${statusColors[a.status] || 'bg-slate-700'}">${a.status}</span></td>
-                            <td class="p-4 text-right space-x-1">
-                                <button onclick="setStatus('${c.key}', 'Passed')" class="bg-green-600 p-1 rounded text-[10px] font-bold">PASS</button>
-                                <button onclick="setStatus('${c.key}', 'Interview')" class="bg-yellow-500 p-1 rounded text-[10px] font-bold text-black">INTERVIEW</button>
-                                <button onclick="setStatus('${c.key}', 'Failed')" class="bg-red-600 p-1 rounded text-[10px] font-bold">FAIL</button>
-                                <button onclick="delApp('${c.key}')" class="bg-slate-900 p-1 rounded text-[10px] text-red-500">🗑️</button>
-                            </td>
-                        </tr>
-                    `;
-                });
-            });
-
-            db.ref('Settings/Departments').on('value', snap => {
-                const list = document.getElementById('dept-list');
-                list.innerHTML = "";
-                snap.forEach(c => {
-                    const d = c.val();
-                    list.innerHTML += `
-                        <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700">
-                            <p class="font-bold mb-1">${d.name}</p>
-                            <p class="text-[10px] text-gray-500 mb-4 uppercase">${d.isOpen ? '🟢 กำลังเปิดรับ' : '🔴 ปิดรับสมัคร'}</p>
-                            <div class="flex gap-2">
-                                <button onclick="toggleDept('${d.name}', ${d.isOpen})" class="flex-1 bg-slate-700 py-2 rounded-lg text-[10px] font-bold">${d.isOpen ? 'ปิดรับสมัคร' : 'เปิดรับสมัคร'}</button>
-                                <button onclick="if(confirm('ลบแผนก?')) db.ref('Settings/Departments/${d.name}').remove()" class="bg-red-900/30 text-red-500 px-3 py-2 rounded-lg text-[10px]">ลบ</button>
-                            </div>
-                        </div>
-                    `;
-                });
-            });
-
-            db.ref('Settings/StaffAccounts').on('value', snap => {
-                const list = document.getElementById('staff-list');
-                list.innerHTML = "";
-                snap.forEach(c => {
-                    list.innerHTML += `
-                        <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700 flex justify-between items-center">
-                            <div><p class="text-sm font-bold">${c.key}</p><p class="text-[9px] text-gray-500 uppercase">${c.val().role}</p></div>
-                            <button onclick="if(confirm('ลบ?')) db.ref('Settings/StaffAccounts/${c.key}').remove()" class="text-red-500">🗑️</button>
-                        </div>
-                    `;
-                });
-            });
-        }
-
-        function viewDetail(user) {
-            db.ref('Applications/' + user).once('value', s => {
-                const d = s.val();
-                document.getElementById('view-user').innerText = user;
-                const box = document.getElementById('view-ans-box');
-                box.innerHTML = "";
-                if(d.answers) d.answers.forEach((ans, i) => {
-                    box.innerHTML += `<div class="bg-slate-800 p-4 rounded-2xl border border-slate-700 mb-2"><p class="text-[9px] text-red-500 font-bold uppercase mb-1">ข้อที่ ${i+1}</p><p class="text-sm">${ans || '-'}</p></div>`;
-                });
-                document.getElementById('view-modal').classList.remove('hidden');
-            });
-        }
-        function closeModal() { document.getElementById('view-modal').classList.add('hidden'); }
-    </script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <title>Staff Control Panel | AirAsia Thai X</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        body { 
-            font-family: 'Kanit', sans-serif; margin: 0; padding: 0; min-height: 100vh;
-            background-color: #0f172a; 
             background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('plane.png'); 
             background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed;
         }
         .login-card { background-color: rgba(255, 255, 255, 0.98); border-top: 8px solid #ce1219; }
         .tab-active { background-color: #ef4444 !important; color: white !important; }
-        .dashboard-bg { background-color: rgba(15, 23, 42, 0.95); min-height: 100vh; width: 100%; position: relative; z-index: 60; }
+        .dashboard-bg { background-color: rgba(15, 23, 42, 0.95); min-height: 100vh; width: 100%; }
+        /* ซ่อน Scrollbar สำหรับเครื่องที่หน้าจอเล็ก */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #ce1219; border-radius: 10px; }
     </style>
 </head>
-<body>
+<body class="text-white">
 
     <div id="login-section" class="min-h-screen flex items-center justify-center p-6">
         <div class="login-card p-8 rounded-[2.5rem] w-full max-w-md text-gray-800 shadow-2xl text-center">
             <h1 class="text-3xl font-bold text-red-600 italic uppercase mb-8">Staff Login</h1>
-            <input type="text" id="login-user" placeholder="Username" class="w-full border-2 border-gray-100 p-4 rounded-2xl mb-4 outline-none focus:border-red-500">
-            <input type="password" id="login-pass" placeholder="Password" class="w-full border-2 border-gray-100 p-4 rounded-2xl mb-6 outline-none focus:border-red-500">
-            <button onclick="handleLogin()" class="w-full bg-red-600 text-white py-4 rounded-2xl font-bold hover:bg-red-700 transition">LOGIN ✈️</button>
+            <div class="space-y-4">
+                <input type="text" id="login-user" placeholder="Username" class="w-full border-2 border-gray-100 p-4 rounded-2xl outline-none focus:border-red-500 transition">
+                <input type="password" id="login-pass" placeholder="Password" class="w-full border-2 border-gray-100 p-4 rounded-2xl outline-none focus:border-red-500 transition">
+                <button onclick="handleLogin()" class="w-full bg-red-600 text-white py-4 rounded-2xl font-bold hover:bg-red-700 transition shadow-lg shadow-red-200">LOGIN ✈️</button>
+            </div>
+            <p class="text-[10px] text-gray-400 mt-6 uppercase tracking-widest">Authorized Personnel Only</p>
         </div>
     </div>
 
-    <div id="staff-dashboard" class="hidden dashboard-bg p-4 md:p-10 text-white">
+    <div id="staff-dashboard" class="hidden dashboard-bg p-4 md:p-10">
         <div class="max-w-6xl mx-auto space-y-6">
+            
             <div class="flex justify-between items-center border-b border-slate-700 pb-5">
                 <div>
                     <h1 class="text-2xl font-bold text-red-500 italic uppercase">AIRASIA <span class="text-white font-light text-sm">ADMIN PANEL</span></h1>
-                    <p id="staff-info" class="text-[10px] text-gray-400 mt-1 uppercase"></p>
+                    <div class="flex items-center gap-2 mt-1">
+                        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                        <p id="staff-info" class="text-[10px] text-gray-400 uppercase tracking-tighter"></p>
+                    </div>
                 </div>
-                <button onclick="location.reload()" class="bg-slate-800 px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-red-600 transition">LOGOUT</button>
+                <button onclick="location.reload()" class="bg-slate-800 px-4 py-2 rounded-xl text-xs font-bold hover:bg-red-600 transition border border-slate-700">LOGOUT</button>
             </div>
 
-            <div class="flex gap-2 overflow-x-auto pb-2" id="menu-tabs">
-                <button onclick="switchTab('apps')" id="btn-apps" class="bg-slate-800 px-6 py-2 rounded-full text-xs font-bold whitespace-nowrap">ใบสมัคร</button>
-                <button onclick="switchTab('depts')" id="btn-depts" class="bg-slate-800 px-6 py-2 rounded-full text-xs font-bold whitespace-nowrap">จัดการแผนก</button>
-                <button onclick="switchTab('staffs')" id="btn-staff-manage" class="hidden bg-slate-800 px-6 py-2 rounded-full text-xs font-bold whitespace-nowrap">Staff Accounts</button>
+            <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide" id="menu-tabs">
+                <button onclick="switchTab('apps')" id="btn-apps" class="bg-slate-800 px-6 py-2 rounded-full text-xs font-bold whitespace-nowrap transition border border-slate-700">ใบสมัคร</button>
+                <button onclick="switchTab('depts')" id="btn-depts" class="bg-slate-800 px-6 py-2 rounded-full text-xs font-bold whitespace-nowrap transition border border-slate-700">จัดการแผนก</button>
+                <button onclick="switchTab('staffs')" id="btn-staff-manage" class="hidden bg-slate-800 px-6 py-2 rounded-full text-xs font-bold whitespace-nowrap transition border border-slate-700">Staff Accounts</button>
             </div>
 
-            <div id="tab-apps" class="tab-content">
-                <div class="mb-4 flex items-center gap-3">
-                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">กรองตามแผนก:</label>
-                    <select id="filter-dept" onchange="loadApps()" class="bg-slate-800 border border-slate-700 text-white text-xs rounded-lg px-4 py-2 outline-none focus:border-red-500">
-                        <option value="All">ทั้งหมด (All Departments)</option>
-                    </select>
+            <div id="tab-apps" class="tab-content space-y-4">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-800/50 p-4 rounded-2xl border border-slate-700">
+                    <div class="flex items-center gap-3">
+                        <span class="text-[10px] font-bold text-gray-400 uppercase">Filter:</span>
+                        <select id="filter-dept" onchange="loadApps()" class="bg-slate-900 border border-slate-700 text-white text-xs rounded-xl px-4 py-2 outline-none focus:border-red-500">
+                            <option value="All">ทุกแผนก (All)</option>
+                        </select>
+                    </div>
+                    <div class="text-[10px] text-gray-500 italic">คลิกที่ชื่อผู้สมัคร เพื่อดูรายละเอียดคำตอบ</div>
                 </div>
 
-                <div class="bg-slate-800/80 rounded-2xl border border-slate-700 overflow-hidden">
-                    <table class="w-full text-left text-sm">
-                        <thead class="bg-slate-900 text-gray-500 text-[10px] uppercase">
-                            <tr>
-                                <th class="p-4">ผู้สมัคร</th>
-                                <th class="p-4">แผนก</th>
-                                <th class="p-4 text-center">สถานะ</th>
-                                <th class="p-4 text-right">ดำเนินการ</th>
-                            </tr>
-                        </thead>
-                        <tbody id="app-list" class="divide-y divide-slate-700"></tbody>
-                    </table>
+                <div class="bg-slate-800/80 rounded-[2rem] border border-slate-700 overflow-hidden shadow-2xl">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-900 text-gray-500 text-[10px] uppercase tracking-widest">
+                                <tr>
+                                    <th class="p-5">ผู้สมัคร</th>
+                                    <th class="p-5">แผนก</th>
+                                    <th class="p-5 text-center">สถานะ</th>
+                                    <th class="p-5 text-right">จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="app-list" class="divide-y divide-slate-700/50"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
             <div id="tab-depts" class="tab-content hidden space-y-6">
-                <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
-                    <h3 class="font-bold text-blue-400 mb-4 text-sm uppercase italic">เพิ่ม/แก้ไขแผนก</h3>
+                <div class="bg-slate-800/80 p-8 rounded-[2rem] border border-slate-700">
+                    <h3 class="font-bold text-blue-400 mb-6 text-sm uppercase italic flex items-center gap-2">
+                        <span class="w-1 h-4 bg-blue-400 rounded-full"></span> เพิ่ม/แก้ไขแผนก
+                    </h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="text" id="dept-name" placeholder="ชื่อแผนก (เช่น Pilot)" class="bg-slate-900 border border-slate-700 p-4 rounded-2xl outline-none">
-                        <input type="text" id="dept-req" placeholder="คุณสมบัติสั้นๆ" class="bg-slate-900 border border-slate-700 p-4 rounded-2xl outline-none text-white">
-                        <textarea id="dept-q" placeholder="คำถาม1, คำถาม2, คำถาม3 (คั่นด้วยคอมม่า)" class="bg-slate-900 border border-slate-700 p-4 rounded-2xl md:col-span-2 outline-none text-white" rows="3"></textarea>
-                        <button onclick="createDept()" class="bg-blue-600 py-4 rounded-2xl font-bold col-span-full hover:bg-blue-500 transition">บันทึกข้อมูลแผนก 💾</button>
+                        <input type="text" id="dept-name" placeholder="ชื่อแผนก (เช่น Pilot)" class="bg-slate-900 border border-slate-700 p-4 rounded-2xl outline-none text-white focus:border-blue-500">
+                        <input type="text" id="dept-req" placeholder="คุณสมบัติสั้นๆ" class="bg-slate-900 border border-slate-700 p-4 rounded-2xl outline-none text-white focus:border-blue-500">
+                        <textarea id="dept-q" placeholder="คำถาม1, คำถาม2 (คั่นด้วยคอมม่า ,)" class="bg-slate-900 border border-slate-700 p-4 rounded-2xl md:col-span-2 outline-none text-white focus:border-blue-500" rows="3"></textarea>
+                        <button onclick="createDept()" class="bg-blue-600 py-4 rounded-2xl font-bold col-span-full hover:bg-blue-500 transition shadow-lg shadow-blue-900/20">บันทึกข้อมูลแผนก</button>
                     </div>
                 </div>
                 <div id="dept-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
             </div>
 
             <div id="tab-staffs" class="tab-content hidden space-y-4">
-                <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
-                    <h3 class="font-bold text-purple-400 mb-4 text-sm uppercase italic">สร้างไอดี Staff ใหม่</h3>
+                <div class="bg-slate-800/80 p-8 rounded-[2rem] border border-slate-700">
+                    <h3 class="font-bold text-purple-400 mb-6 text-sm uppercase italic">Manage Staff</h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <input type="text" id="new-staff-user" placeholder="Username" class="bg-slate-900 border border-slate-700 p-4 rounded-2xl outline-none">
                         <input type="text" id="new-staff-pass" placeholder="Password" class="bg-slate-900 border border-slate-700 p-4 rounded-2xl outline-none">
@@ -340,19 +108,21 @@
                             <option value="Admin">Admin</option>
                             <option value="Mod">Mod</option>
                         </select>
-                        <button onclick="createStaff()" class="bg-purple-600 py-4 rounded-2xl font-bold col-span-full hover:bg-purple-500">สร้างไอดี</button>
+                        <button onclick="createStaff()" class="bg-purple-600 py-4 rounded-2xl font-bold col-span-full hover:bg-purple-500 transition">สร้างไอดี Staff</button>
                     </div>
                 </div>
                 <div id="staff-list" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
             </div>
+
         </div>
     </div>
 
-    <div id="view-modal" class="hidden fixed inset-0 bg-black/95 flex items-center justify-center p-4 z-[100] backdrop-blur-md">
-        <div class="bg-slate-900 p-8 rounded-[2.5rem] w-full max-w-lg border border-slate-700 text-white">
-            <h3 id="view-user" class="text-xl font-bold text-red-500 mb-4 uppercase italic"></h3>
-            <div id="view-ans-box" class="space-y-3 max-h-[60vh] overflow-y-auto"></div>
-            <button onclick="closeModal()" class="w-full bg-slate-800 mt-6 py-4 rounded-2xl font-bold">ปิดหน้าต่าง</button>
+    <div id="view-modal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center p-4 z-[100] backdrop-blur-sm">
+        <div class="bg-slate-900 p-8 rounded-[2.5rem] w-full max-w-lg border border-slate-700 shadow-2xl">
+            <h3 id="view-user" class="text-xl font-bold text-red-500 mb-1 uppercase italic"></h3>
+            <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-6">Application Detail</p>
+            <div id="view-ans-box" class="space-y-3 max-h-[50vh] overflow-y-auto pr-2"></div>
+            <button onclick="closeModal()" class="w-full bg-slate-800 mt-8 py-4 rounded-2xl font-bold border border-slate-700 hover:bg-slate-700 transition">Close</button>
         </div>
     </div>
 
@@ -360,7 +130,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
     <script>
-        // ใส่ Config เดิมของคุณ Dom ตรงนี้
+        // ใส่ Firebase Config ของคุณ Dom
         const firebaseConfig = {
             apiKey: "AiZaSyC-y19Y2WF-3efQ0ixWZnosrOeqFaDRvMQ",
             authDomain: "airasia-thaix-career.firebaseapp.com",
@@ -375,23 +145,31 @@
         function handleLogin() {
             const u = document.getElementById('login-user').value.trim();
             const p = document.getElementById('login-pass').value.trim();
-            if(u === "Dom" && p === "AirAsia") setupDashboard("Dom", "HeadAdmin");
-            else {
+            
+            // Login หลักของคุณ Dom
+            if(u === "Dom" && p === "AirAsia") {
+                setupDashboard("Dom", "HeadAdmin");
+            } else {
                 db.ref('Settings/StaffAccounts/' + u).once('value', s => {
                     const d = s.val();
                     if(d && d.password === p) setupDashboard(u, d.role);
-                    else alert("ชื่อหรือรหัสผ่านผิด!");
+                    else alert("Username หรือ Password ไม่ถูกต้อง!");
                 });
             }
         }
 
         function setupDashboard(name, role) {
             userData = { name, role };
-            document.getElementById('login-section').classList.add('hidden');
+            // ซ่อนส่วน Login และแสดง Dashboard
+            document.getElementById('login-section').style.display = 'none';
             document.getElementById('staff-dashboard').classList.remove('hidden');
             document.getElementById('staff-info').innerText = `${name} | ${role}`;
-            if(role === "HeadAdmin" || role === "Admin") document.getElementById('btn-staff-manage').classList.remove('hidden');
-            switchTab('apps'); loadData();
+            
+            if(role === "HeadAdmin" || role === "Admin") {
+                document.getElementById('btn-staff-manage').classList.remove('hidden');
+            }
+            switchTab('apps');
+            loadData();
         }
 
         function switchTab(id) {
@@ -401,60 +179,45 @@
             document.getElementById('btn-' + (id === 'staffs' ? 'staff-manage' : id)).classList.add('tab-active');
         }
 
-        function setStatus(user, status) { db.ref('Applications/' + user).update({ status }); }
-        function delApp(user) { if(confirm(`ลบผู้สมัครชื่อ ${user} ใช่หรือไม่?`)) db.ref('Applications/' + user).remove(); }
-        function toggleDept(name, currentStatus) { db.ref('Settings/Departments/' + name).update({ isOpen: !currentStatus }); }
-
-        function createDept() {
-            const n = document.getElementById('dept-name').value.trim();
-            const r = document.getElementById('dept-req').value.trim();
-            const q = document.getElementById('dept-q').value.trim();
-            if(!n) return;
-            db.ref('Settings/Departments/' + n).set({ name: n, requirement: r, questions: q, isOpen: true }).then(() => {
-                alert("บันทึกสำเร็จ!");
-                document.getElementById('dept-name').value = "";
-                document.getElementById('dept-req').value = "";
-                document.getElementById('dept-q').value = "";
-            });
-        }
-
         function loadData() {
-            // โหลดรายชื่อแผนกมาใส่ใน Filter
+            // โหลดแผนกเข้า Filter
             db.ref('Settings/Departments').on('value', snap => {
                 const filter = document.getElementById('filter-dept');
                 const currentFilter = filter.value;
-                filter.innerHTML = '<option value="All">ทั้งหมด (All Departments)</option>';
+                filter.innerHTML = '<option value="All">ทุกแผนก (All)</option>';
+                
+                const list = document.getElementById('dept-list');
+                list.innerHTML = "";
+
                 snap.forEach(c => {
                     const d = c.val();
                     filter.innerHTML += `<option value="${d.name}">${d.name}</option>`;
-                });
-                filter.value = currentFilter;
-
-                const list = document.getElementById('dept-list');
-                list.innerHTML = "";
-                snap.forEach(c => {
-                    const d = c.val();
+                    
                     list.innerHTML += `
-                        <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700">
-                            <p class="font-bold mb-1">${d.name}</p>
-                            <p class="text-[10px] text-gray-500 mb-4 uppercase">${d.isOpen ? '🟢 กำลังเปิดรับ' : '🔴 ปิดรับสมัคร'}</p>
+                        <div class="bg-slate-800/50 p-6 rounded-[2rem] border border-slate-700 flex flex-col justify-between">
+                            <div>
+                                <p class="font-bold text-lg">${d.name}</p>
+                                <p class="text-[10px] mt-1 mb-4 uppercase ${d.isOpen ? 'text-green-400' : 'text-red-500'}">${d.isOpen ? '🟢 Open' : '🔴 Closed'}</p>
+                            </div>
                             <div class="flex gap-2">
-                                <button onclick="toggleDept('${d.name}', ${d.isOpen})" class="flex-1 bg-slate-700 py-2 rounded-lg text-[10px] font-bold">${d.isOpen ? 'ปิดรับสมัคร' : 'เปิดรับสมัคร'}</button>
-                                <button onclick="if(confirm('ลบแผนก?')) db.ref('Settings/Departments/${d.name}').remove()" class="bg-red-900/30 text-red-500 px-3 py-2 rounded-lg text-[10px]">ลบ</button>
+                                <button onclick="toggleDept('${d.name}', ${d.isOpen})" class="flex-1 bg-slate-700 py-2 rounded-xl text-[10px] font-bold hover:bg-slate-600 transition">${d.isOpen ? 'ปิดรับ' : 'เปิดรับ'}</button>
+                                <button onclick="if(confirm('ลบแผนก?')) db.ref('Settings/Departments/${d.name}').remove()" class="text-red-500 p-2">🗑️</button>
                             </div>
                         </div>
                     `;
                 });
+                filter.value = currentFilter;
             });
 
-            loadApps(); // เรียกโหลดใบสมัคร
+            loadApps();
 
+            // โหลด Staff List
             db.ref('Settings/StaffAccounts').on('value', snap => {
                 const list = document.getElementById('staff-list');
                 list.innerHTML = "";
                 snap.forEach(c => {
                     list.innerHTML += `
-                        <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700 flex justify-between items-center">
+                        <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700 flex justify-between items-center">
                             <div><p class="text-sm font-bold">${c.key}</p><p class="text-[9px] text-gray-500 uppercase">${c.val().role}</p></div>
                             <button onclick="if(confirm('ลบ?')) db.ref('Settings/StaffAccounts/${c.key}').remove()" class="text-red-500">🗑️</button>
                         </div>
@@ -473,19 +236,22 @@
                     if (selectedDept !== "All" && a.department !== selectedDept) return;
 
                     const statusColors = { 
-                        "Pending": "bg-slate-700", "Passed": "bg-green-600", 
-                        "Failed": "bg-red-600", "Interview": "bg-yellow-500 text-black"
+                        "Pending": "bg-slate-700 text-gray-300", 
+                        "Passed": "bg-green-600 text-white", 
+                        "Failed": "bg-red-600 text-white", 
+                        "Interview": "bg-yellow-500 text-black"
                     };
+                    
                     list.innerHTML += `
-                        <tr class="hover:bg-slate-700/30">
-                            <td class="p-4 font-bold text-blue-400 cursor-pointer" onclick="viewDetail('${c.key}')">${c.key} 🔍</td>
-                            <td class="p-4 text-gray-400 text-xs">${a.department}</td>
-                            <td class="p-4 text-center"><span class="px-2 py-1 rounded text-[10px] font-bold uppercase ${statusColors[a.status] || 'bg-slate-700'}">${a.status}</span></td>
-                            <td class="p-4 text-right space-x-1">
-                                <button onclick="setStatus('${c.key}', 'Passed')" class="bg-green-600 p-1 rounded text-[10px] font-bold">PASS</button>
-                                <button onclick="setStatus('${c.key}', 'Interview')" class="bg-yellow-500 p-1 rounded text-[10px] font-bold text-black">INTERVIEW</button>
-                                <button onclick="setStatus('${c.key}', 'Failed')" class="bg-red-600 p-1 rounded text-[10px] font-bold">FAIL</button>
-                                <button onclick="delApp('${c.key}')" class="bg-slate-900 p-1 rounded text-[10px] text-red-500">🗑️</button>
+                        <tr class="hover:bg-slate-700/30 transition">
+                            <td class="p-5 font-bold text-blue-400 cursor-pointer hover:underline" onclick="viewDetail('${c.key}')">${c.key} 🔍</td>
+                            <td class="p-5 text-gray-400 text-xs">${a.department}</td>
+                            <td class="p-5 text-center"><span class="px-3 py-1 rounded-full text-[9px] font-bold uppercase ${statusColors[a.status] || 'bg-slate-700'}">${a.status}</span></td>
+                            <td class="p-5 text-right flex gap-1 justify-end">
+                                <button onclick="setStatus('${c.key}', 'Passed')" class="bg-green-600/20 text-green-500 border border-green-600/30 px-2 py-1 rounded-lg text-[9px] font-bold hover:bg-green-600 hover:text-white transition">PASS</button>
+                                <button onclick="setStatus('${c.key}', 'Interview')" class="bg-yellow-500/20 text-yellow-500 border border-yellow-500/30 px-2 py-1 rounded-lg text-[9px] font-bold hover:bg-yellow-500 hover:text-black transition">INT</button>
+                                <button onclick="setStatus('${c.key}', 'Failed')" class="bg-red-600/20 text-red-500 border border-red-600/30 px-2 py-1 rounded-lg text-[9px] font-bold hover:bg-red-600 hover:text-white transition">FAIL</button>
+                                <button onclick="delApp('${c.key}')" class="ml-2 text-gray-500 hover:text-red-500">🗑️</button>
                             </td>
                         </tr>
                     `;
@@ -493,6 +259,29 @@
             });
         }
 
+        // Functions อื่นๆ (Status, Delete, Dept)
+        function setStatus(user, status) { db.ref('Applications/' + user).update({ status }); }
+        function delApp(user) { if(confirm(`ยืนยันการลบใบสมัครของ ${user}?`)) db.ref('Applications/' + user).remove(); }
+        function toggleDept(name, currentStatus) { db.ref('Settings/Departments/' + name).update({ isOpen: !currentStatus }); }
+        function createDept() {
+            const n = document.getElementById('dept-name').value.trim();
+            const r = document.getElementById('dept-req').value.trim();
+            const q = document.getElementById('dept-q').value.trim();
+            if(!n) return alert("กรุณาใส่ชื่อแผนก");
+            db.ref('Settings/Departments/' + n).set({ name: n, requirement: r, questions: q, isOpen: true }).then(() => {
+                alert("บันทึกแผนกสำเร็จ");
+                document.getElementById('dept-name').value = "";
+                document.getElementById('dept-req').value = "";
+                document.getElementById('dept-q').value = "";
+            });
+        }
+        function createStaff() {
+            const u = document.getElementById('new-staff-user').value.trim();
+            const p = document.getElementById('new-staff-pass').value.trim();
+            const r = document.getElementById('new-staff-role').value;
+            if(!u || !p) return alert("กรุณากรอกข้อมูลให้ครบ");
+            db.ref('Settings/StaffAccounts/' + u).set({ password: p, role: r }).then(() => alert("สร้างบัญชีสำเร็จ"));
+        }
         function viewDetail(user) {
             db.ref('Applications/' + user).once('value', s => {
                 const d = s.val();
@@ -500,7 +289,7 @@
                 const box = document.getElementById('view-ans-box');
                 box.innerHTML = "";
                 if(d.answers) d.answers.forEach((ans, i) => {
-                    box.innerHTML += `<div class="bg-slate-800 p-4 rounded-2xl border border-slate-700 mb-2"><p class="text-[9px] text-red-500 font-bold uppercase mb-1">ข้อที่ ${i+1}</p><p class="text-sm">${ans || '-'}</p></div>`;
+                    box.innerHTML += `<div class="bg-slate-800 p-4 rounded-2xl border border-slate-700 mb-2"><p class="text-[9px] text-red-500 font-bold uppercase mb-1">คำถามที่ ${i+1}</p><p class="text-sm text-gray-200">${ans || '-'}</p></div>`;
                 });
                 document.getElementById('view-modal').classList.remove('hidden');
             });
