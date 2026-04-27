@@ -352,4 +352,160 @@
         <div class="bg-slate-900 p-8 rounded-[2.5rem] w-full max-w-lg border border-slate-700 text-white">
             <h3 id="view-user" class="text-xl font-bold text-red-500 mb-4 uppercase italic"></h3>
             <div id="view-ans-box" class="space-y-3 max-h-[60vh] overflow-y-auto"></div>
-            <button onclick="closeModal()"
+            <button onclick="closeModal()" class="w-full bg-slate-800 mt-6 py-4 rounded-2xl font-bold">ปิดหน้าต่าง</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <script>
+        // ใส่ Config เดิมของคุณ Dom ตรงนี้
+        const firebaseConfig = {
+            apiKey: "AiZaSyC-y19Y2WF-3efQ0ixWZnosrOeqFaDRvMQ",
+            authDomain: "airasia-thaix-career.firebaseapp.com",
+            databaseURL: "https://airasia-thaix-career-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "airasia-thaix-career"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let userData = { name: "", role: "" };
+
+        function handleLogin() {
+            const u = document.getElementById('login-user').value.trim();
+            const p = document.getElementById('login-pass').value.trim();
+            if(u === "Dom" && p === "AirAsia") setupDashboard("Dom", "HeadAdmin");
+            else {
+                db.ref('Settings/StaffAccounts/' + u).once('value', s => {
+                    const d = s.val();
+                    if(d && d.password === p) setupDashboard(u, d.role);
+                    else alert("ชื่อหรือรหัสผ่านผิด!");
+                });
+            }
+        }
+
+        function setupDashboard(name, role) {
+            userData = { name, role };
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('staff-dashboard').classList.remove('hidden');
+            document.getElementById('staff-info').innerText = `${name} | ${role}`;
+            if(role === "HeadAdmin" || role === "Admin") document.getElementById('btn-staff-manage').classList.remove('hidden');
+            switchTab('apps'); loadData();
+        }
+
+        function switchTab(id) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            document.querySelectorAll('#menu-tabs button').forEach(b => b.classList.remove('tab-active'));
+            document.getElementById('tab-' + id).classList.remove('hidden');
+            document.getElementById('btn-' + (id === 'staffs' ? 'staff-manage' : id)).classList.add('tab-active');
+        }
+
+        function setStatus(user, status) { db.ref('Applications/' + user).update({ status }); }
+        function delApp(user) { if(confirm(`ลบผู้สมัครชื่อ ${user} ใช่หรือไม่?`)) db.ref('Applications/' + user).remove(); }
+        function toggleDept(name, currentStatus) { db.ref('Settings/Departments/' + name).update({ isOpen: !currentStatus }); }
+
+        function createDept() {
+            const n = document.getElementById('dept-name').value.trim();
+            const r = document.getElementById('dept-req').value.trim();
+            const q = document.getElementById('dept-q').value.trim();
+            if(!n) return;
+            db.ref('Settings/Departments/' + n).set({ name: n, requirement: r, questions: q, isOpen: true }).then(() => {
+                alert("บันทึกสำเร็จ!");
+                document.getElementById('dept-name').value = "";
+                document.getElementById('dept-req').value = "";
+                document.getElementById('dept-q').value = "";
+            });
+        }
+
+        function loadData() {
+            // โหลดรายชื่อแผนกมาใส่ใน Filter
+            db.ref('Settings/Departments').on('value', snap => {
+                const filter = document.getElementById('filter-dept');
+                const currentFilter = filter.value;
+                filter.innerHTML = '<option value="All">ทั้งหมด (All Departments)</option>';
+                snap.forEach(c => {
+                    const d = c.val();
+                    filter.innerHTML += `<option value="${d.name}">${d.name}</option>`;
+                });
+                filter.value = currentFilter;
+
+                const list = document.getElementById('dept-list');
+                list.innerHTML = "";
+                snap.forEach(c => {
+                    const d = c.val();
+                    list.innerHTML += `
+                        <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700">
+                            <p class="font-bold mb-1">${d.name}</p>
+                            <p class="text-[10px] text-gray-500 mb-4 uppercase">${d.isOpen ? '🟢 กำลังเปิดรับ' : '🔴 ปิดรับสมัคร'}</p>
+                            <div class="flex gap-2">
+                                <button onclick="toggleDept('${d.name}', ${d.isOpen})" class="flex-1 bg-slate-700 py-2 rounded-lg text-[10px] font-bold">${d.isOpen ? 'ปิดรับสมัคร' : 'เปิดรับสมัคร'}</button>
+                                <button onclick="if(confirm('ลบแผนก?')) db.ref('Settings/Departments/${d.name}').remove()" class="bg-red-900/30 text-red-500 px-3 py-2 rounded-lg text-[10px]">ลบ</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            });
+
+            loadApps(); // เรียกโหลดใบสมัคร
+
+            db.ref('Settings/StaffAccounts').on('value', snap => {
+                const list = document.getElementById('staff-list');
+                list.innerHTML = "";
+                snap.forEach(c => {
+                    list.innerHTML += `
+                        <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700 flex justify-between items-center">
+                            <div><p class="text-sm font-bold">${c.key}</p><p class="text-[9px] text-gray-500 uppercase">${c.val().role}</p></div>
+                            <button onclick="if(confirm('ลบ?')) db.ref('Settings/StaffAccounts/${c.key}').remove()" class="text-red-500">🗑️</button>
+                        </div>
+                    `;
+                });
+            });
+        }
+
+        function loadApps() {
+            const selectedDept = document.getElementById('filter-dept').value;
+            db.ref('Applications').on('value', snap => {
+                const list = document.getElementById('app-list');
+                list.innerHTML = "";
+                snap.forEach(c => {
+                    const a = c.val();
+                    if (selectedDept !== "All" && a.department !== selectedDept) return;
+
+                    const statusColors = { 
+                        "Pending": "bg-slate-700", "Passed": "bg-green-600", 
+                        "Failed": "bg-red-600", "Interview": "bg-yellow-500 text-black"
+                    };
+                    list.innerHTML += `
+                        <tr class="hover:bg-slate-700/30">
+                            <td class="p-4 font-bold text-blue-400 cursor-pointer" onclick="viewDetail('${c.key}')">${c.key} 🔍</td>
+                            <td class="p-4 text-gray-400 text-xs">${a.department}</td>
+                            <td class="p-4 text-center"><span class="px-2 py-1 rounded text-[10px] font-bold uppercase ${statusColors[a.status] || 'bg-slate-700'}">${a.status}</span></td>
+                            <td class="p-4 text-right space-x-1">
+                                <button onclick="setStatus('${c.key}', 'Passed')" class="bg-green-600 p-1 rounded text-[10px] font-bold">PASS</button>
+                                <button onclick="setStatus('${c.key}', 'Interview')" class="bg-yellow-500 p-1 rounded text-[10px] font-bold text-black">INTERVIEW</button>
+                                <button onclick="setStatus('${c.key}', 'Failed')" class="bg-red-600 p-1 rounded text-[10px] font-bold">FAIL</button>
+                                <button onclick="delApp('${c.key}')" class="bg-slate-900 p-1 rounded text-[10px] text-red-500">🗑️</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            });
+        }
+
+        function viewDetail(user) {
+            db.ref('Applications/' + user).once('value', s => {
+                const d = s.val();
+                document.getElementById('view-user').innerText = user;
+                const box = document.getElementById('view-ans-box');
+                box.innerHTML = "";
+                if(d.answers) d.answers.forEach((ans, i) => {
+                    box.innerHTML += `<div class="bg-slate-800 p-4 rounded-2xl border border-slate-700 mb-2"><p class="text-[9px] text-red-500 font-bold uppercase mb-1">ข้อที่ ${i+1}</p><p class="text-sm">${ans || '-'}</p></div>`;
+                });
+                document.getElementById('view-modal').classList.remove('hidden');
+            });
+        }
+        function closeModal() { document.getElementById('view-modal').classList.add('hidden'); }
+    </script>
+</body>
+</html>
