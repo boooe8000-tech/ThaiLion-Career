@@ -7,21 +7,32 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Kanit', sans-serif; background-color: #f3f4f6; }
+        body { font-family: 'Kanit', sans-serif; background-color: #f3f4f6; margin: 0; }
         .airasia-red-bg { background-color: #ce1219; }
-        .disabled-btn { background-color: #9ca3af !important; cursor: not-allowed; }
         
-        /* สไตล์สำหรับเมนูบนสุด */
+        /* --- ส่วนที่ปรับปรุงให้รูป seat.png ชัดเจนขึ้น --- */
+        .hero-section-with-bg {
+            /* ปรับความเข้มสีแดงทับรูปเหลือแค่ 0.3 เพื่อให้รูป seat.png ดูชัดที่สุด */
+            background-image: linear-gradient(rgba(206, 18, 25, 0.3), rgba(206, 18, 25, 0.3)), url('seat.png');
+            background-size: cover;
+            background-position: center 40%; /* ปรับตำแหน่งให้เห็นหน้าต่างและที่นั่งพอดี */
+            background-repeat: no-repeat;
+            
+            /* เทคนิคช่วยให้รูปคมชัดขึ้น */
+            image-rendering: -webkit-optimize-contrast; 
+            filter: contrast(1.05) brightness(1.1);
+        }
+
         .nav-link { font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; color: white; }
         .nav-link:hover { color: #fecaca; }
-
-        /* ส่วนใหม่: Hero Section ที่ใช้รูป seat.png เป็นพื้นหลัง */
-        .hero-section-with-bg {
-            /* ใส่สีแดง AirAsia ทับรูปไว้ 80% เพื่อให้ข้อความอ่านง่าย */
-            background-image: linear-gradient(rgba(206, 18, 25, 0.8), rgba(206, 18, 25, 0.8)), url('seat.png');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
+        .disabled-btn { background-color: #9ca3af !important; cursor: not-allowed; }
+        
+        /* ปรับแต่งกล่องเนื้อหาให้ลอยเด่น */
+        .content-card {
+            background-color: white;
+            border-radius: 2.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+            border-top: 8px solid #ce1219;
         }
     </style>
 </head>
@@ -38,38 +49,38 @@
         </div>
     </nav>
 
-    <div class="hero-section-with-bg h-64 w-full flex items-center justify-center text-white relative overflow-hidden -mt-1">
+    <div class="hero-section-with-bg h-72 w-full flex items-center justify-center text-white relative overflow-hidden -mt-1">
         <div class="z-10 text-center">
-            <h1 class="text-4xl font-bold italic tracking-tighter uppercase">Recruitment AirAsia</h1>
-            <p class="text-[10px] opacity-80 mt-2 uppercase tracking-[0.3em] font-light">Best Airline In The World</p>
+            <h1 class="text-4xl font-bold italic tracking-tighter uppercase drop-shadow-lg">Recruitment AirAsia</h1>
+            <p class="text-[10px] opacity-90 mt-2 uppercase tracking-[0.3em] font-light drop-shadow-md">Best Airline In The World</p>
         </div>
     </div>
 
-    <div class="max-w-4xl mx-auto -mt-10 p-4 relative z-20">
-        <div class="bg-white rounded-[2.5rem] shadow-2xl p-8 mb-10 border-t-8 border-red-600">
+    <div class="max-w-4xl mx-auto -mt-12 p-4 relative z-20">
+        <div class="content-card p-8 mb-10">
             <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
                 ตำแหน่งที่เปิดรับสมัคร
             </h2>
             
             <div id="dept-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <p class="text-center text-gray-400 py-10 col-span-full italic">กำลังตรวจสอบเที่ยวบิน (โหลดข้อมูล)...</p>
+                <p class="text-center text-gray-400 py-10 col-span-full italic">กำลังตรวจสอบเที่ยวบิน...</p>
             </div>
         </div>
     </div>
 
-    <div id="apply-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[150] flex items-center justify-center p-4">
+    <div id="apply-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-[150] flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-lg rounded-[2.5rem] p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-start mb-6">
                 <div>
                     <h3 id="modal-dept-title" class="text-2xl font-bold text-red-600"></h3>
                     <p class="text-[10px] text-gray-400 uppercase tracking-widest italic">Recruitment Form</p>
                 </div>
-                <button onclick="closeModal()" class="text-gray-300 hover:text-red-500 text-2xl">&times;</button>
+                <button onclick="closeModal()" class="text-gray-300 hover:text-red-500 text-3xl font-light">&times;</button>
             </div>
             
-            <div class="space-y-4">
+            <div class="space-y-5">
                 <div>
-                    <label class="text-[10px] font-bold text-gray-500 ml-1 uppercase">ชื่อเล่น (In-game Name)</label>
+                    <label class="text-[10px] font-bold text-gray-400 ml-1 uppercase">ชื่อเล่น (In-game Name)</label>
                     <input type="text" id="app-name" placeholder="ระบุชื่อเพื่อใช้เข้าสู่ระบบ" class="w-full border-2 border-gray-100 p-4 rounded-2xl outline-none focus:border-red-500 transition">
                 </div>
                 <div id="questions-area" class="space-y-4"></div>
@@ -82,6 +93,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
     <script>
+        // ใช้ Firebase Config เดิมของคุณ Dom
         const firebaseConfig = {
             apiKey: "AiZaSyC-y19Y2WF-3efQ0ixWZnosrOeqFaDRvMQ",
             authDomain: "airasia-thaix-career.firebaseapp.com",
@@ -104,18 +116,17 @@
                 }
                 snap.forEach(child => {
                     const d = child.val();
-                    const statusText = d.isOpen ? "Status: Open" : "Status: Closed";
                     const statusColor = d.isOpen ? "text-green-500" : "text-red-500 font-bold";
-                    const btnClass = d.isOpen ? "airasia-red-bg" : "disabled-btn";
+                    const btnClass = d.isOpen ? "airasia-red-bg" : "bg-gray-400 cursor-not-allowed";
                     
                     container.innerHTML += `
-                        <div class="border-2 border-gray-50 p-6 rounded-[2rem] hover:border-red-100 transition group bg-white shadow-sm flex flex-col justify-between">
+                        <div class="border-2 border-gray-50 p-6 rounded-[2rem] bg-white shadow-sm flex flex-col justify-between hover:border-red-100 transition">
                             <div>
                                 <h4 class="text-lg font-bold text-gray-800">${d.name}</h4>
-                                <p class="text-xs text-gray-400 mt-1 mb-4 h-8 overflow-hidden">${d.requirement || 'ต้องการผู้มีใจรักในงานบริการ'}</p>
+                                <p class="text-xs text-gray-400 mt-1 mb-4 h-10 overflow-hidden text-ellipsis">${d.requirement || 'ต้องการผู้มีใจรักในงานบริการ'}</p>
                             </div>
                             <div>
-                                <p class="text-[9px] mb-3 ${statusColor} uppercase tracking-widest">${statusText}</p>
+                                <p class="text-[9px] mb-3 ${statusColor} uppercase tracking-widest font-bold">${d.isOpen ? '🟢 Status: Open' : '🔴 Status: Closed'}</p>
                                 <button onclick="${d.isOpen ? `openModal('${d.name}', '${d.questions}')` : ''}" 
                                     class="w-full ${btnClass} text-white py-3 rounded-xl text-xs font-bold transition">
                                     ${d.isOpen ? 'Apply Now' : 'Closed'}
@@ -136,8 +147,8 @@
             currentQuestions.forEach((q, i) => {
                 area.innerHTML += `
                     <div>
-                        <label class="text-[10px] font-bold text-gray-500 ml-1 uppercase">คำถาม: ${q.trim()}</label>
-                        <textarea class="q-input w-full border-2 border-gray-100 p-4 rounded-2xl outline-none focus:border-red-500 transition" rows="2"></textarea>
+                        <label class="text-[10px] font-bold text-gray-400 ml-1 uppercase">คำถามที่ ${i+1}: ${q.trim()}</label>
+                        <textarea class="q-input w-full border-2 border-gray-100 p-4 rounded-2xl outline-none focus:border-red-500 transition" rows="2" placeholder="พิมพ์คำตอบของคุณที่นี่..."></textarea>
                     </div>
                 `;
             });
@@ -148,10 +159,17 @@
 
         function submitApp() {
             const name = document.getElementById('app-name').value.trim();
-            if(!name) return alert("กรุณากรอกชื่อเล่นเพื่อใช้ในการเช็คผล");
+            if(!name) return alert("กรุณากรอกชื่อเล่น (In-game Name) เพื่อส่งใบสมัคร");
             
             const answers = [];
-            document.querySelectorAll('.q-input').forEach(input => answers.push(input.value.trim()));
+            const inputs = document.querySelectorAll('.q-input');
+            let complete = true;
+            inputs.forEach(input => {
+                if(!input.value.trim()) complete = false;
+                answers.push(input.value.trim());
+            });
+
+            if(!complete) return alert("กรุณาตอบคำถามให้ครบทุกข้อครับ");
 
             db.ref('Applications/' + name).set({
                 department: currentDept,
@@ -159,7 +177,7 @@
                 status: "Pending",
                 time: new Date().toLocaleString('th-TH')
             }).then(() => {
-                alert("บันทึกข้อมูลเรียบร้อย! คุณสามารถใช้ชื่อเล่นเพื่อเช็คสถานะได้ในภายหลัง");
+                alert("ส่งใบสมัครสำเร็จ! อย่าลืมไปเช็คสถานะด้วยชื่อเล่นของคุณนะ");
                 closeModal();
             });
         }
