@@ -248,3 +248,108 @@
     </script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>Staff Control Panel | AirAsia Thai X</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Kanit', sans-serif; margin: 0; padding: 0; min-height: 100vh;
+            background-color: #0f172a; 
+            background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('plane.png'); 
+            background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed;
+        }
+        .login-card { background-color: rgba(255, 255, 255, 0.98); border-top: 8px solid #ce1219; }
+        .tab-active { background-color: #ef4444 !important; color: white !important; }
+        .dashboard-bg { background-color: rgba(15, 23, 42, 0.95); min-height: 100vh; width: 100%; position: relative; z-index: 60; }
+    </style>
+</head>
+<body>
+
+    <div id="login-section" class="min-h-screen flex items-center justify-center p-6">
+        <div class="login-card p-8 rounded-[2.5rem] w-full max-w-md text-gray-800 shadow-2xl text-center">
+            <h1 class="text-3xl font-bold text-red-600 italic uppercase mb-8">Staff Login</h1>
+            <input type="text" id="login-user" placeholder="Username" class="w-full border-2 border-gray-100 p-4 rounded-2xl mb-4 outline-none focus:border-red-500">
+            <input type="password" id="login-pass" placeholder="Password" class="w-full border-2 border-gray-100 p-4 rounded-2xl mb-6 outline-none focus:border-red-500">
+            <button onclick="handleLogin()" class="w-full bg-red-600 text-white py-4 rounded-2xl font-bold hover:bg-red-700 transition">LOGIN ✈️</button>
+        </div>
+    </div>
+
+    <div id="staff-dashboard" class="hidden dashboard-bg p-4 md:p-10 text-white">
+        <div class="max-w-6xl mx-auto space-y-6">
+            <div class="flex justify-between items-center border-b border-slate-700 pb-5">
+                <div>
+                    <h1 class="text-2xl font-bold text-red-500 italic uppercase">AIRASIA <span class="text-white font-light text-sm">ADMIN PANEL</span></h1>
+                    <p id="staff-info" class="text-[10px] text-gray-400 mt-1 uppercase"></p>
+                </div>
+                <button onclick="location.reload()" class="bg-slate-800 px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-red-600 transition">LOGOUT</button>
+            </div>
+
+            <div class="flex gap-2 overflow-x-auto pb-2" id="menu-tabs">
+                <button onclick="switchTab('apps')" id="btn-apps" class="bg-slate-800 px-6 py-2 rounded-full text-xs font-bold whitespace-nowrap">ใบสมัคร</button>
+                <button onclick="switchTab('depts')" id="btn-depts" class="bg-slate-800 px-6 py-2 rounded-full text-xs font-bold whitespace-nowrap">จัดการแผนก</button>
+                <button onclick="switchTab('staffs')" id="btn-staff-manage" class="hidden bg-slate-800 px-6 py-2 rounded-full text-xs font-bold whitespace-nowrap">Staff Accounts</button>
+            </div>
+
+            <div id="tab-apps" class="tab-content">
+                <div class="mb-4 flex items-center gap-3">
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">กรองตามแผนก:</label>
+                    <select id="filter-dept" onchange="loadApps()" class="bg-slate-800 border border-slate-700 text-white text-xs rounded-lg px-4 py-2 outline-none focus:border-red-500">
+                        <option value="All">ทั้งหมด (All Departments)</option>
+                    </select>
+                </div>
+
+                <div class="bg-slate-800/80 rounded-2xl border border-slate-700 overflow-hidden">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-900 text-gray-500 text-[10px] uppercase">
+                            <tr>
+                                <th class="p-4">ผู้สมัคร</th>
+                                <th class="p-4">แผนก</th>
+                                <th class="p-4 text-center">สถานะ</th>
+                                <th class="p-4 text-right">ดำเนินการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="app-list" class="divide-y divide-slate-700"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="tab-depts" class="tab-content hidden space-y-6">
+                <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
+                    <h3 class="font-bold text-blue-400 mb-4 text-sm uppercase italic">เพิ่ม/แก้ไขแผนก</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="text" id="dept-name" placeholder="ชื่อแผนก (เช่น Pilot)" class="bg-slate-900 border border-slate-700 p-4 rounded-2xl outline-none">
+                        <input type="text" id="dept-req" placeholder="คุณสมบัติสั้นๆ" class="bg-slate-900 border border-slate-700 p-4 rounded-2xl outline-none text-white">
+                        <textarea id="dept-q" placeholder="คำถาม1, คำถาม2, คำถาม3 (คั่นด้วยคอมม่า)" class="bg-slate-900 border border-slate-700 p-4 rounded-2xl md:col-span-2 outline-none text-white" rows="3"></textarea>
+                        <button onclick="createDept()" class="bg-blue-600 py-4 rounded-2xl font-bold col-span-full hover:bg-blue-500 transition">บันทึกข้อมูลแผนก 💾</button>
+                    </div>
+                </div>
+                <div id="dept-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </div>
+
+            <div id="tab-staffs" class="tab-content hidden space-y-4">
+                <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
+                    <h3 class="font-bold text-purple-400 mb-4 text-sm uppercase italic">สร้างไอดี Staff ใหม่</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <input type="text" id="new-staff-user" placeholder="Username" class="bg-slate-900 border border-slate-700 p-4 rounded-2xl outline-none">
+                        <input type="text" id="new-staff-pass" placeholder="Password" class="bg-slate-900 border border-slate-700 p-4 rounded-2xl outline-none">
+                        <select id="new-staff-role" class="bg-slate-900 border border-slate-700 p-4 rounded-2xl outline-none">
+                            <option value="Admin">Admin</option>
+                            <option value="Mod">Mod</option>
+                        </select>
+                        <button onclick="createStaff()" class="bg-purple-600 py-4 rounded-2xl font-bold col-span-full hover:bg-purple-500">สร้างไอดี</button>
+                    </div>
+                </div>
+                <div id="staff-list" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-modal" class="hidden fixed inset-0 bg-black/95 flex items-center justify-center p-4 z-[100] backdrop-blur-md">
+        <div class="bg-slate-900 p-8 rounded-[2.5rem] w-full max-w-lg border border-slate-700 text-white">
+            <h3 id="view-user" class="text-xl font-bold text-red-500 mb-4 uppercase italic"></h3>
+            <div id="view-ans-box" class="space-y-3 max-h-[60vh] overflow-y-auto"></div>
+            <button onclick="closeModal()"
