@@ -3,14 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AirAsia Thai X | Career</title>
+    <title>AirAsia Thai X | Recruitment</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Kanit', sans-serif; background-color: #f3f4f6; margin: 0; }
         .airasia-red-bg { background-color: #ce1219; }
-        
-        /* Hero Section ใช้รูป seat.png แบบชัดเจน */
         .hero-section-with-bg {
             background-image: linear-gradient(rgba(206, 18, 25, 0.3), rgba(206, 18, 25, 0.3)), url('seat.png');
             background-size: cover;
@@ -19,10 +17,10 @@
             image-rendering: -webkit-optimize-contrast; 
             filter: contrast(1.05) brightness(1.1);
         }
-
         .nav-link { font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; color: white; }
         .nav-link:hover { color: #fecaca; }
         .content-card { background-color: white; border-radius: 2.5rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1); border-top: 8px solid #ce1219; }
+        .disabled-btn { background-color: #9ca3af !important; cursor: not-allowed; }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -32,7 +30,7 @@
             <div class="w-2 h-6 bg-white rounded-full"></div>
             <span class="font-bold italic tracking-tighter uppercase text-sm text-white">AirAsia <span class="font-light">Thai X</span></span>
         </div>
-        <div class="flex gap-4">
+        <div class="flex gap-4 font-bold">
             <a href="check-status.html" class="nav-link">เช็คสถานะ</a>
             <a href="staff.html" class="nav-link bg-white/20 px-3 py-1 rounded-lg">Staff Login</a>
         </div>
@@ -47,9 +45,9 @@
 
     <div class="max-w-4xl mx-auto -mt-12 p-4 relative z-20">
         <div class="content-card p-8 mb-10">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2 text-white">ตำแหน่งที่เปิดรับสมัคร</h2>
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">ตำแหน่งที่เปิดรับสมัคร</h2>
             <div id="dept-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <p class="text-center text-gray-400 py-10 col-span-full italic">กำลังโหลดข้อมูล...</p>
+                <p class="text-center text-gray-400 py-10 col-span-full italic">กำลังตรวจสอบเที่ยวบิน...</p>
             </div>
         </div>
     </div>
@@ -59,17 +57,17 @@
             <div class="flex justify-between items-start mb-6 text-white">
                 <div>
                     <h3 id="modal-dept-title" class="text-2xl font-bold text-red-600"></h3>
-                    <p class="text-[10px] text-gray-400 uppercase tracking-widest italic">Recruitment Form</p>
+                    <p class="text-[10px] text-gray-400 uppercase tracking-widest italic font-bold">Recruitment Form</p>
                 </div>
                 <button onclick="closeModal()" class="text-gray-300 hover:text-red-500 text-3xl font-light">&times;</button>
             </div>
             <div class="space-y-5">
                 <div>
                     <label class="text-[10px] font-bold text-gray-400 ml-1 uppercase">ชื่อเล่น (In-game Name)</label>
-                    <input type="text" id="app-name" placeholder="ระบุชื่อเพื่อสมัคร" class="w-full border-2 border-gray-100 p-4 rounded-2xl outline-none focus:border-red-500 transition">
+                    <input type="text" id="app-name" placeholder="ระบุชื่อเพื่อสมัคร" class="w-full border-2 border-gray-100 p-4 rounded-2xl outline-none focus:border-red-500 transition font-bold text-gray-700">
                 </div>
                 <div id="questions-area" class="space-y-4"></div>
-                <button onclick="submitApp()" class="w-full airasia-red-bg text-white py-4 rounded-2xl font-bold text-lg hover:opacity-90 transition shadow-lg mt-4 shadow-red-200">ส่งใบสมัคร ✈️</button>
+                <button onclick="submitApp()" class="w-full airasia-red-bg text-white py-4 rounded-2xl font-bold text-lg hover:opacity-90 transition shadow-lg mt-4 shadow-red-200 uppercase">ส่งใบสมัคร ✈️</button>
             </div>
         </div>
     </div>
@@ -94,19 +92,28 @@
             db.ref('Settings/Departments').on('value', snap => {
                 const container = document.getElementById('dept-container');
                 container.innerHTML = "";
+                if(!snap.exists()) {
+                    container.innerHTML = "<p class='col-span-full text-center text-gray-400'>ไม่มีตำแหน่งงานในขณะนี้</p>";
+                    return;
+                }
                 snap.forEach(child => {
                     const d = child.val();
-                    const statusColor = d.isOpen ? "text-green-500" : "text-red-500 font-bold";
-                    const btnClass = d.isOpen ? "airasia-red-bg" : "bg-gray-400 cursor-not-allowed";
+                    const statusText = d.isOpen ? "🟢 Status: Open" : "🔴 Status: Closed";
+                    const statusColor = d.isOpen ? "text-green-500" : "text-red-500";
+                    const btnClass = d.isOpen ? "airasia-red-bg shadow-red-100 shadow-lg" : "disabled-btn";
+                    
                     container.innerHTML += `
-                        <div class="border-2 border-gray-50 p-6 rounded-[2rem] bg-white shadow-sm flex flex-col justify-between hover:border-red-100 transition">
+                        <div class="border-2 border-gray-50 p-6 rounded-[2rem] bg-white shadow-sm flex flex-col justify-between hover:border-red-100 transition group">
                             <div>
                                 <h4 class="text-lg font-bold text-gray-800">${d.name}</h4>
-                                <p class="text-xs text-gray-400 mt-1 mb-4 h-10 overflow-hidden text-ellipsis">${d.requirement || 'ต้องการผู้มีใจรักในงานบริการ'}</p>
+                                <p class="text-xs text-gray-400 mt-1 mb-4 h-10 overflow-hidden">${d.requirement || 'ต้องการผู้มีใจรักในงานบริการ'}</p>
                             </div>
                             <div>
-                                <p class="text-[9px] mb-3 ${statusColor} uppercase tracking-widest font-bold">${d.isOpen ? '🟢 Status: Open' : '🔴 Status: Closed'}</p>
-                                <button onclick="${d.isOpen ? `openModal('${d.name}', '${d.questions}')` : ''}" class="w-full ${btnClass} text-white py-3 rounded-xl text-xs font-bold transition">${d.isOpen ? 'Apply Now' : 'Closed'}</button>
+                                <p class="text-[9px] mb-3 ${statusColor} uppercase tracking-widest font-bold italic">${statusText}</p>
+                                <button onclick="${d.isOpen ? `openModal('${d.name}', '${d.questions}')` : ''}" 
+                                    class="w-full ${btnClass} text-white py-3 rounded-xl text-xs font-bold transition uppercase">
+                                    ${d.isOpen ? 'Apply Now' : 'Closed'}
+                                </button>
                             </div>
                         </div>
                     `;
@@ -124,7 +131,7 @@
                 area.innerHTML += `
                     <div>
                         <label class="text-[10px] font-bold text-gray-400 ml-1 uppercase">คำถาม: ${q.trim()}</label>
-                        <textarea class="q-input w-full border-2 border-gray-100 p-4 rounded-2xl outline-none focus:border-red-500 transition" rows="2"></textarea>
+                        <textarea class="q-input w-full border-2 border-gray-100 p-4 rounded-2xl outline-none focus:border-red-500 transition text-gray-700 font-medium" rows="2" placeholder="พิมพ์คำตอบที่นี่..."></textarea>
                     </div>
                 `;
             });
@@ -135,7 +142,7 @@
 
         function submitApp() {
             const name = document.getElementById('app-name').value.trim();
-            if(!name) return alert("กรุณากรอกชื่อ");
+            if(!name) return alert("กรุณากรอกชื่อเล่นเพื่อสมัคร");
             
             const applicationData = [];
             const inputs = document.querySelectorAll('.q-input');
@@ -148,7 +155,7 @@
                 applicationData.push({ q: qText, a: aText });
             });
 
-            if(!complete) return alert("กรุณาตอบคำถามให้ครบ");
+            if(!complete) return alert("กรุณาตอบคำถามให้ครบทุกข้อครับ");
 
             db.ref('Applications/' + name).set({
                 department: currentDept,
@@ -156,7 +163,7 @@
                 status: "Pending",
                 time: new Date().toLocaleString('th-TH')
             }).then(() => {
-                alert("ส่งใบสมัครสำเร็จ!");
+                alert("ส่งใบสมัครสำเร็จ! สามารถใช้ชื่อเพื่อเช็คสถานะได้เลย");
                 closeModal();
             });
         }
