@@ -2,83 +2,187 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>AirAsia Staff Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AirAsia Thai X | Career</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Kanit', sans-serif; background-color: #f3f4f6; margin: 0; }
+        .airasia-red-bg { background-color: #ce1219; }
+        
+        /* --- ส่วนที่ปรับปรุงให้รูป seat.png ชัดเจนขึ้น --- */
+        .hero-section-with-bg {
+            /* ปรับความเข้มสีแดงทับรูปเหลือแค่ 0.3 เพื่อให้รูป seat.png ดูชัดที่สุด */
+            background-image: linear-gradient(rgba(206, 18, 25, 0.3), rgba(206, 18, 25, 0.3)), url('seat.png');
+            background-size: cover;
+            background-position: center 40%; /* ปรับตำแหน่งให้เห็นหน้าต่างและที่นั่งพอดี */
+            background-repeat: no-repeat;
+            
+            /* เทคนิคช่วยให้รูปคมชัดขึ้น */
+            image-rendering: -webkit-optimize-contrast; 
+            filter: contrast(1.05) brightness(1.1);
+        }
+
+        .nav-link { font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; color: white; }
+        .nav-link:hover { color: #fecaca; }
+        .disabled-btn { background-color: #9ca3af !important; cursor: not-allowed; }
+        
+        /* ปรับแต่งกล่องเนื้อหาให้ลอยเด่น */
+        .content-card {
+            background-color: white;
+            border-radius: 2.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+            border-top: 8px solid #ce1219;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <nav class="airasia-red-bg py-4 px-6 flex justify-between items-center shadow-lg sticky top-0 z-[100]">
+        <div class="flex items-center gap-2">
+            <div class="w-2 h-6 bg-white rounded-full"></div>
+            <span class="font-bold italic tracking-tighter uppercase text-sm text-white">AirAsia <span class="font-light">Thai X</span></span>
+        </div>
+        <div class="flex gap-4">
+            <a href="check-status.html" class="nav-link">เช็คสถานะ</a>
+            <a href="staff.html" class="nav-link bg-white/20 px-3 py-1 rounded-lg">Staff Login</a>
+        </div>
+    </nav>
+
+    <div class="hero-section-with-bg h-72 w-full flex items-center justify-center text-white relative overflow-hidden -mt-1">
+        <div class="z-10 text-center">
+            <h1 class="text-4xl font-bold italic tracking-tighter uppercase drop-shadow-lg">Recruitment AirAsia</h1>
+            <p class="text-[10px] opacity-90 mt-2 uppercase tracking-[0.3em] font-light drop-shadow-md">Best Airline In The World</p>
+        </div>
+    </div>
+
+    <div class="max-w-4xl mx-auto -mt-12 p-4 relative z-20">
+        <div class="content-card p-8 mb-10">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                ตำแหน่งที่เปิดรับสมัคร
+            </h2>
+            
+            <div id="dept-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <p class="text-center text-gray-400 py-10 col-span-full italic">กำลังตรวจสอบเที่ยวบิน...</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="apply-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-[150] flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-lg rounded-[2.5rem] p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <h3 id="modal-dept-title" class="text-2xl font-bold text-red-600"></h3>
+                    <p class="text-[10px] text-gray-400 uppercase tracking-widest italic">Recruitment Form</p>
+                </div>
+                <button onclick="closeModal()" class="text-gray-300 hover:text-red-500 text-3xl font-light">&times;</button>
+            </div>
+            
+            <div class="space-y-5">
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 ml-1 uppercase">ชื่อเล่น (In-game Name)</label>
+                    <input type="text" id="app-name" placeholder="ระบุชื่อเพื่อใช้เข้าสู่ระบบ" class="w-full border-2 border-gray-100 p-4 rounded-2xl outline-none focus:border-red-500 transition">
+                </div>
+                <div id="questions-area" class="space-y-4"></div>
+                <button onclick="submitApp()" class="w-full airasia-red-bg text-white py-4 rounded-2xl font-bold text-lg hover:opacity-90 transition shadow-lg mt-4 shadow-red-200">ส่งใบสมัคร ✈️</button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-</head>
-<body class="bg-[#0b0f19] text-white font-sans min-h-screen flex items-center justify-center p-6">
-
-    <!-- 🔒 หน้า Login -->
-    <div id="login-overlay" class="max-w-md w-full bg-slate-900/50 p-10 rounded-[2rem] border border-white/5 shadow-2xl">
-        <h2 class="text-3xl font-black text-center mb-8 italic uppercase text-red-600">Staff Login</h2>
-        <div class="space-y-4">
-            <input type="text" id="u" placeholder="Staff ID (เช่น 10yji94)" class="w-full bg-black p-4 rounded-xl outline-none border border-slate-800 focus:border-red-600 font-bold">
-            <input type="password" id="p" placeholder="Password (เช่น 25568)" class="w-full bg-black p-4 rounded-xl outline-none border border-slate-800 focus:border-red-600 font-bold">
-            <button onclick="doLogin()" class="w-full bg-red-600 py-4 rounded-xl font-black hover:bg-red-500 transition">ACCESS SYSTEM</button>
-        </div>
-        <p id="err" class="text-red-500 text-xs text-center mt-4 font-bold hidden uppercase">Login Failed: ข้อมูลไม่ถูกต้อง</p>
-    </div>
-
-    <!-- ✈️ หน้าหลัก (ซ่อนไว้ก่อน) -->
-    <div id="main" class="hidden fixed inset-0 bg-[#0b0f19] p-10 overflow-auto">
-        <h1 class="text-4xl font-black italic">WELCOME, <span id="user-name" class="text-red-600"></span></h1>
-        <p id="user-rank" class="text-gray-500 font-bold uppercase tracking-widest mt-1"></p>
-        <hr class="my-8 border-slate-800">
-        <div id="apps" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3"></div>
-    </div>
 
     <script>
-        // ใช้ Config เดิมที่คุณ Dom มี
+        // ใช้ Firebase Config เดิมของคุณ Dom
         const firebaseConfig = {
             apiKey: "AiZaSyC-y19Y2WF-3efQ0ixWZnosrOeqFaDRvMQ",
-            databaseURL: "https://airasia-thaix-career-default-rtdb.asia-southeast1.firebasedatabase.app"
+            authDomain: "airasia-thaix-career.firebaseapp.com",
+            databaseURL: "https://airasia-thaix-career-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "airasia-thaix-career"
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        function doLogin() {
-            const user = document.getElementById('u').value.trim();
-            const pass = document.getElementById('p').value.trim();
-            
-            // เช็คเข้าโฟลเดอร์ StaffAccounts ตามรูปเป๊ะๆ
-            db.ref('StaffAccounts/' + user).once('value').then(snap => {
-                const data = snap.val();
-                
-                // ตรวจสอบว่ารหัสตรงกับ "25568" หรือรหัสที่อยู่ในเบสไหม
-                if (data && String(data.password) === String(pass)) {
-                    document.getElementById('login-overlay').classList.add('hidden');
-                    document.getElementById('main').classList.remove('hidden');
-                    
-                    document.getElementById('user-name').innerText = user;
-                    
-                    // บังคับยศให้ Dom เป็น Head Supervisor ตามสั่ง
-                    if (user.toLowerCase() === 'dom') {
-                        document.getElementById('user-rank').innerText = "Head Supervisor";
-                    } else {
-                        document.getElementById('user-rank').innerText = data.role || "Staff";
-                    }
-                    
-                    loadData();
-                } else {
-                    document.getElementById('err').classList.remove('hidden');
-                }
-            }).catch(e => alert("Firebase Error: " + e.message));
-        }
+        let currentDept = "";
+        let currentQuestions = [];
 
-        function loadData() {
-            db.ref('Applications').on('value', snap => {
-                const cont = document.getElementById('apps');
-                cont.innerHTML = "";
-                snap.forEach(c => {
-                    const a = c.val();
-                    cont.innerHTML += `<div class="bg-slate-900 p-6 rounded-2xl border border-white/5">
-                        <h3 class="text-xl font-bold">${c.key}</h3>
-                        <p class="text-red-500 text-xs font-bold uppercase">${a.department || 'No Dept'}</p>
-                    </div>`;
+        function loadDepts() {
+            db.ref('Settings/Departments').on('value', snap => {
+                const container = document.getElementById('dept-container');
+                container.innerHTML = "";
+                if(!snap.exists()) {
+                    container.innerHTML = "<p class='col-span-full text-center text-gray-400'>ยังไม่มีตำแหน่งที่เปิดรับในขณะนี้</p>";
+                    return;
+                }
+                snap.forEach(child => {
+                    const d = child.val();
+                    const statusColor = d.isOpen ? "text-green-500" : "text-red-500 font-bold";
+                    const btnClass = d.isOpen ? "airasia-red-bg" : "bg-gray-400 cursor-not-allowed";
+                    
+                    container.innerHTML += `
+                        <div class="border-2 border-gray-50 p-6 rounded-[2rem] bg-white shadow-sm flex flex-col justify-between hover:border-red-100 transition">
+                            <div>
+                                <h4 class="text-lg font-bold text-gray-800">${d.name}</h4>
+                                <p class="text-xs text-gray-400 mt-1 mb-4 h-10 overflow-hidden text-ellipsis">${d.requirement || 'ต้องการผู้มีใจรักในงานบริการ'}</p>
+                            </div>
+                            <div>
+                                <p class="text-[9px] mb-3 ${statusColor} uppercase tracking-widest font-bold">${d.isOpen ? '🟢 Status: Open' : '🔴 Status: Closed'}</p>
+                                <button onclick="${d.isOpen ? `openModal('${d.name}', '${d.questions}')` : ''}" 
+                                    class="w-full ${btnClass} text-white py-3 rounded-xl text-xs font-bold transition">
+                                    ${d.isOpen ? 'Apply Now' : 'Closed'}
+                                </button>
+                            </div>
+                        </div>
+                    `;
                 });
             });
         }
+
+        function openModal(name, qs) {
+            currentDept = name;
+            currentQuestions = qs ? qs.split(',') : [];
+            document.getElementById('modal-dept-title').innerText = name;
+            const area = document.getElementById('questions-area');
+            area.innerHTML = "";
+            currentQuestions.forEach((q, i) => {
+                area.innerHTML += `
+                    <div>
+                        <label class="text-[10px] font-bold text-gray-400 ml-1 uppercase">คำถามที่ ${i+1}: ${q.trim()}</label>
+                        <textarea class="q-input w-full border-2 border-gray-100 p-4 rounded-2xl outline-none focus:border-red-500 transition" rows="2" placeholder="พิมพ์คำตอบของคุณที่นี่..."></textarea>
+                    </div>
+                `;
+            });
+            document.getElementById('apply-modal').classList.remove('hidden');
+        }
+
+        function closeModal() { document.getElementById('apply-modal').classList.add('hidden'); }
+
+        function submitApp() {
+            const name = document.getElementById('app-name').value.trim();
+            if(!name) return alert("กรุณากรอกชื่อเล่น (In-game Name) เพื่อส่งใบสมัคร");
+            
+            const answers = [];
+            const inputs = document.querySelectorAll('.q-input');
+            let complete = true;
+            inputs.forEach(input => {
+                if(!input.value.trim()) complete = false;
+                answers.push(input.value.trim());
+            });
+
+            if(!complete) return alert("กรุณาตอบคำถามให้ครบทุกข้อครับ");
+
+            db.ref('Applications/' + name).set({
+                department: currentDept,
+                answers: answers,
+                status: "Pending",
+                time: new Date().toLocaleString('th-TH')
+            }).then(() => {
+                alert("ส่งใบสมัครสำเร็จ! อย่าลืมไปเช็คสถานะด้วยชื่อเล่นของคุณนะ");
+                closeModal();
+            });
+        }
+
+        loadDepts();
     </script>
 </body>
 </html>
