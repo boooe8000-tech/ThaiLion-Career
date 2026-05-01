@@ -10,7 +10,7 @@
         body { font-family: 'Kanit', sans-serif; background-color: #f3f4f6; margin: 0; }
         .airasia-red-bg { background-color: #ce1219; }
         
-        /* สไตล์ Hero Section: ปรับรูป seat.png ให้ชัดที่สุด */
+        /* Hero Section ใช้รูป seat.png แบบชัดเจน */
         .hero-section-with-bg {
             background-image: linear-gradient(rgba(206, 18, 25, 0.3), rgba(206, 18, 25, 0.3)), url('seat.png');
             background-size: cover;
@@ -22,7 +22,6 @@
 
         .nav-link { font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; color: white; }
         .nav-link:hover { color: #fecaca; }
-        .disabled-btn { background-color: #9ca3af !important; cursor: not-allowed; }
         .content-card { background-color: white; border-radius: 2.5rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1); border-top: 8px solid #ce1219; }
     </style>
 </head>
@@ -41,14 +40,14 @@
 
     <div class="hero-section-with-bg h-72 w-full flex items-center justify-center text-white relative overflow-hidden -mt-1">
         <div class="z-10 text-center">
-            <h1 class="text-4xl font-bold italic tracking-tighter uppercase drop-shadow-lg text-white">Recruitment AirAsia</h1>
-            <p class="text-[10px] opacity-90 mt-2 uppercase tracking-[0.3em] font-light drop-shadow-md text-white">Best Airline In The World</p>
+            <h1 class="text-4xl font-bold italic tracking-tighter uppercase drop-shadow-lg">Recruitment AirAsia</h1>
+            <p class="text-[10px] opacity-90 mt-2 uppercase tracking-[0.3em] font-light drop-shadow-md">Best Airline In The World</p>
         </div>
     </div>
 
     <div class="max-w-4xl mx-auto -mt-12 p-4 relative z-20">
         <div class="content-card p-8 mb-10">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">ตำแหน่งที่เปิดรับสมัคร</h2>
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2 text-white">ตำแหน่งที่เปิดรับสมัคร</h2>
             <div id="dept-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <p class="text-center text-gray-400 py-10 col-span-full italic">กำลังโหลดข้อมูล...</p>
             </div>
@@ -57,7 +56,7 @@
 
     <div id="apply-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-[150] flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-lg rounded-[2.5rem] p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-start mb-6">
+            <div class="flex justify-between items-start mb-6 text-white">
                 <div>
                     <h3 id="modal-dept-title" class="text-2xl font-bold text-red-600"></h3>
                     <p class="text-[10px] text-gray-400 uppercase tracking-widest italic">Recruitment Form</p>
@@ -67,7 +66,7 @@
             <div class="space-y-5">
                 <div>
                     <label class="text-[10px] font-bold text-gray-400 ml-1 uppercase">ชื่อเล่น (In-game Name)</label>
-                    <input type="text" id="app-name" placeholder="ระบุชื่อเพื่อใช้เข้าสู่ระบบ" class="w-full border-2 border-gray-100 p-4 rounded-2xl outline-none focus:border-red-500 transition">
+                    <input type="text" id="app-name" placeholder="ระบุชื่อเพื่อสมัคร" class="w-full border-2 border-gray-100 p-4 rounded-2xl outline-none focus:border-red-500 transition">
                 </div>
                 <div id="questions-area" class="space-y-4"></div>
                 <button onclick="submitApp()" class="w-full airasia-red-bg text-white py-4 rounded-2xl font-bold text-lg hover:opacity-90 transition shadow-lg mt-4 shadow-red-200">ส่งใบสมัคร ✈️</button>
@@ -125,7 +124,7 @@
                 area.innerHTML += `
                     <div>
                         <label class="text-[10px] font-bold text-gray-400 ml-1 uppercase">คำถาม: ${q.trim()}</label>
-                        <textarea class="q-input w-full border-2 border-gray-100 p-4 rounded-2xl outline-none focus:border-red-500 transition" rows="2" placeholder="พิมพ์คำตอบของคุณ..."></textarea>
+                        <textarea class="q-input w-full border-2 border-gray-100 p-4 rounded-2xl outline-none focus:border-red-500 transition" rows="2"></textarea>
                     </div>
                 `;
             });
@@ -136,7 +135,7 @@
 
         function submitApp() {
             const name = document.getElementById('app-name').value.trim();
-            if(!name) return alert("กรุณากรอกชื่อเล่น");
+            if(!name) return alert("กรุณากรอกชื่อ");
             
             const applicationData = [];
             const inputs = document.querySelectorAll('.q-input');
@@ -149,15 +148,15 @@
                 applicationData.push({ q: qText, a: aText });
             });
 
-            if(!complete) return alert("กรุณาตอบคำถามให้ครบถ้วน");
+            if(!complete) return alert("กรุณาตอบคำถามให้ครบ");
 
             db.ref('Applications/' + name).set({
                 department: currentDept,
-                fullData: applicationData, // เก็บทั้ง Q และ A
+                fullData: applicationData,
                 status: "Pending",
                 time: new Date().toLocaleString('th-TH')
             }).then(() => {
-                alert("ส่งใบสมัครเรียบร้อย!");
+                alert("ส่งใบสมัครสำเร็จ!");
                 closeModal();
             });
         }
